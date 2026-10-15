@@ -18,4 +18,9 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
 
+  <!-- Fotot provizore të katalogut të testimit (licencat: SeedImages/ATTRIBUTIONS.md). -->
+  <ItemGroup>
+    <Content Include="SeedImages/**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

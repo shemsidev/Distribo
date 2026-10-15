@@ -183,6 +183,32 @@ internal static class SeedCatalog
         ]),
     ];
 
+    /// <summary>
+    /// Foto provizore (SeedImages/&lt;çelësi&gt;.jpg, licenca te SeedImages/ATTRIBUTIONS.md) sipas fjalëve në emër.
+    /// Rendi ka rëndësi: rregulli i parë që përputhet fiton. Pa përputhje mbetet vizatimi SVG.
+    /// </summary>
+    internal static readonly (string Contains, string Image)[] ImageRules =
+    [
+        ("Whisky", "whisky"), ("Vodka", "vodka"), ("Gin ", "gin"), ("Rum", "rum"), ("Konjak", "cognac"),
+        ("Liker", "liqueur"), ("Raki", "raki"),
+        ("Birra e Zezë", "dark_beer"), ("Birra Weiss", "wheat_beer"), ("Birra Lager 0.33L", "beer_can"), ("Birra", "beer_bottle"),
+        ("Kola 0.33L", "cola_can"), ("Kola", "cola"), ("Portokall me gaz", "orange_soda"), ("Limon me gaz", "lemon_soda"),
+        ("Lëng portokalli", "orange_juice"), ("Lëng molle", "apple_juice"), ("Lëng pjeshke", "peach_juice"),
+        ("Ujë mineral", "sparkling_water"), ("Ujë", "water"), ("energjike", "energy"),
+        ("Ginger Ale", "ginger_ale"), ("Tonik", "tonic"), ("Shurup", "syrup"), ("Lime", "lime"),
+        ("Verë e kuqe", "red_wine"), ("Verë e bardhë", "white_wine"), ("Verë rozë", "rose_wine"),
+        ("Prosecco", "prosecco"), ("Shampanjë", "champagne"), ("Spumante", "champagne"),
+        ("Kafe espresso kokërr", "coffee_beans"), ("Kafe e bluar", "ground_coffee"), ("Kapsula", "capsules"),
+        ("Çaj", "tea"), ("Çokollatë e nxehtë", "hot_chocolate"),
+        ("Patatina", "chips"), ("Kikirikë", "nuts"), ("Fëstëkë", "nuts"), ("Biskota", "cookies"),
+        ("Çokollatë qumështi", "chocolate"), ("Kroasan", "croissant"),
+        ("Gota plastike", "cups"), ("Kallamë", "straws"), ("Detergjent enësh", "dish_soap"), ("Zbardhues", "bleach"),
+        ("Pastrues xhamash", "glass_cleaner"), ("Qese mbeturinash", "trash_bags"),
+    ];
+
+    internal static string? ImageFor(string productName) =>
+        ImageRules.FirstOrDefault(r => productName.Contains(r.Contains, StringComparison.OrdinalIgnoreCase)).Image;
+
     /// <summary>Produktet me ofertë aktive në të dhënat e testimit.</summary>
     internal static readonly string[] PromoProducts =
     [

@@ -36,7 +36,7 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: tr.tabs.home, headerShown: false, tabBarIcon: tabIcon('home-outline', 'home') }} />
+      <Tabs.Screen name="(home)" options={{ title: tr.tabs.home, headerShown: false, tabBarIcon: tabIcon('home-outline', 'home') }} />
       <Tabs.Screen name="catalog" options={{ title: tr.tabs.search, tabBarIcon: tabIcon('search-outline', 'search') }} />
       <Tabs.Screen
         name="cart"

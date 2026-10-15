@@ -35,6 +35,6 @@
    `development`/`preview`. Në Expo Go Android push-et nuk punojnë; njoftimet brenda aplikacionit punojnë kudo.
 3. **Lidhja me programin e distribucionit.** Duhen tabelat e artikujve/çmimeve/stokut dhe mënyra e regjistrimit
    të porosive (shih docs/DEPLOYMENT.md, pika 6). Deri atëherë API ka databazën e vet dhe katalog testimi.
-4. **Fotot e produkteve.** Katalogu i testimit përdor SVG të gjeneruara. Fotot reale vijnë nga programi ose nga
+4. **Fotot e produkteve.** Katalogu i testimit përdor foto provizore me licencë të lirë (`server/Distribo.Api/SeedImages`, autorët te `ATTRIBUTIONS.md`). Fotot reale vijnë nga programi ose nga
    një ngarkim administrativ.
 5. **Panel administrimi** (opsional). Statuset dhe miratimi i klientëve tani bëhen përmes `/api/integration/*`.

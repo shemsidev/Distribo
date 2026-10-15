@@ -59,7 +59,6 @@ function RootNavigator() {
         }}
       >
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="category/[id]" options={{ headerShown: true, title: '' }} />
         <Stack.Screen
           name="products/[id]"
           options={{

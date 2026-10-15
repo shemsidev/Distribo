@@ -8,6 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppText, Button, Divider, ErrorState, KeyValue, LoadingState, Notice, ProductImage, QuantityStepper, useToast } from '@/components';
 import { useSession } from '@/features/authentication/SessionProvider';
 import { useCart } from '@/features/cart/CartProvider';
+import { cartCount, localEstimate } from '@/features/cart/cartReducer';
 import { decreaseQuantity, increaseQuantity, minimumQuantity } from '@/features/cart/quantity';
 import { useLayout } from '@/hooks/useLayout';
 import { errorMessage, useT } from '@/localization';
@@ -29,13 +30,19 @@ export default function ProductOrderModal() {
   const { status } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
   const productId = Number(id);
-  const { quantityOf, dispatch, add } = useCart();
+  const { quantityOf, dispatch, add, state: cart } = useCart();
   const inCart = quantityOf(productId);
   const [selected, setSelected] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
   const query = useQuery({ queryKey: queryKeys.product(productId), queryFn: () => catalogApi.product(productId) });
   const close = () => (router.canGoBack() ? router.back() : router.replace('/'));
+  // Mbyll dritaren dhe hap direkt shportën (tab-i), pa u kthyer faqe pas faqeje.
+  const openCart = () => {
+    close();
+    router.navigate('/cart');
+  };
+  const cartItems = cartCount(cart);
 
   let body: React.ReactNode;
   if (query.isPending) body = <View style={styles.stateBox}><LoadingState /></View>;
@@ -150,6 +157,18 @@ export default function ProductOrderModal() {
             fullWidth
             variant="dark"
           />
+          {cartItems > 0 ? (
+            <Pressable onPress={openCart} style={styles.cartLink} accessibilityRole="link">
+              <Ionicons name="cart" size={18} color={colors.primary} />
+              <AppText variant="bodyStrong" color="primary" style={styles.flex}>
+                {tr.product.cartSummary(tr.common.items(cartItems), formatPrice(localEstimate(cart)))}
+              </AppText>
+              <AppText variant="bodyStrong" color="primary">
+                {tr.product.viewCart}
+              </AppText>
+              <Ionicons name="chevron-forward" size={16} color={colors.primary} />
+            </Pressable>
+          ) : null}
         </View>
       </>
     );
@@ -203,4 +222,15 @@ const styles = StyleSheet.create({
   details: { gap: spacing.sm },
   footer: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, borderTopWidth: 1, borderTopColor: colors.border },
   stateBox: { minHeight: 240 },
+  flex: { flex: 1 },
+  cartLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+  },
 });

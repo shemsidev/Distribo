@@ -129,6 +129,8 @@ export const en: Translations = {
     productLabel: 'Product',
     addToCartShort: 'Add to Cart',
     details: 'Details',
+    cartSummary: (items: string, total: string) => `Cart: ${items} · ≈ ${total}`,
+    viewCart: 'View cart',
     addToCart: 'Add to cart',
     add: 'Add',
     inCart: (qty: string) => `In cart: ${qty}`,
@@ -218,6 +220,8 @@ export const en: Translations = {
     cancelConfirmTitle: 'Cancel order',
     cancelConfirmMessage: 'Are you sure you want to cancel this order?',
     pricesAtOrder: 'Prices recorded at the time of the order.',
+    continueShopping: 'Continue shopping',
+    close: 'Close',
   },
   status: {
     Pending: 'Pending',

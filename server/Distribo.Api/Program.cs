@@ -165,7 +165,7 @@ if (config.GetValue("Database:MigrateOnStartup", false) || app.Environment.IsDev
     await db.Database.MigrateAsync();
     var seed = config.GetSection(SeedOptions.Section).Get<SeedOptions>() ?? new SeedOptions();
     await DbSeeder.SeedAsync(db, seed, app.Environment.WebRootPath ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot"),
-        app.Logger);
+        app.Environment.ContentRootPath, app.Logger);
 }
 
 app.Run();

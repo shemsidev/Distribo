@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RefreshControl, StyleSheet, View } from 'react-native';
+import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -36,6 +36,11 @@ export default function OrderDetailScreen() {
   const queryClient = useQueryClient();
   const { add } = useCart();
   const { id, created } = useLocalSearchParams<{ id: string; created?: string }>();
+  // Pas dërgimit: kthim me një prekje në kryefaqe (pa kaluar sërish te konfirmimi/shporta).
+  const backToShop = () => {
+    if (router.canDismiss()) router.dismissAll();
+    router.navigate('/');
+  };
   const [reordering, setReordering] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -94,7 +99,19 @@ export default function OrderDetailScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: tr.orders.number(o.number) }} />
+      <Stack.Screen
+        options={{
+          title: tr.orders.number(o.number),
+          headerLeft: created
+            ? () => (
+                <Pressable onPress={backToShop} hitSlop={12} accessibilityRole="button" accessibilityLabel={tr.orders.close}>
+                  <Ionicons name="close" size={26} color={colors.primary} />
+                </Pressable>
+              )
+            : undefined,
+          gestureEnabled: !created,
+        }}
+      />
       <Screen
         scroll
         style={styles.content}
@@ -130,6 +147,9 @@ export default function OrderDetailScreen() {
             <AppText color="textSecondary" align="center">
               {tr.orders.successMessage}
             </AppText>
+            <View style={styles.successAction}>
+              <Button title={tr.orders.continueShopping} variant="dark" onPress={backToShop} fullWidth />
+            </View>
           </View>
         ) : null}
 
@@ -223,6 +243,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { gap: spacing.lg },
   success: { alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.md },
+  successAction: { maxWidth: 400, width: '100%', marginTop: spacing.sm, alignSelf: 'center' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   step: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start', paddingVertical: spacing.xs },
   dot: {

@@ -128,6 +128,8 @@ export const sq = {
     productLabel: 'Produkti',
     addToCartShort: 'Shto në Shportë',
     details: 'Detaje',
+    cartSummary: (items: string, total: string) => `Shporta: ${items} · ≈ ${total}`,
+    viewCart: 'Shiko shportën',
     addToCart: 'Shto në shportë',
     add: 'Shto',
     inCart: (qty: string) => `Në shportë: ${qty}`,
@@ -217,6 +219,8 @@ export const sq = {
     cancelConfirmTitle: 'Anulo porosinë',
     cancelConfirmMessage: 'Je i sigurt që dëshiron ta anulosh këtë porosi?',
     pricesAtOrder: 'Çmimet e regjistruara në momentin e porosisë.',
+    continueShopping: 'Vazhdo blerjet',
+    close: 'Mbyll',
   },
   status: {
     Pending: 'Në pritje',

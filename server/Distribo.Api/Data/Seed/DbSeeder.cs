@@ -31,9 +31,10 @@ public class DemoUserOptions
 /// </summary>
 public static class DbSeeder
 {
-    public static async Task SeedAsync(AppDbContext db, SeedOptions options, string webRoot, ILogger logger, CancellationToken ct = default)
+    public static async Task SeedAsync(AppDbContext db, SeedOptions options, string webRoot, string contentRoot, ILogger logger, CancellationToken ct = default)
     {
         if (!options.Enabled) return;
+        var photos = new SeedPhotos(Path.Combine(contentRoot, "SeedImages"), webRoot);
 
         var now = DateTime.UtcNow;
         if (!await db.Categories.AnyAsync(ct))
@@ -48,7 +49,8 @@ public static class DbSeeder
                     Name = root.Name,
                     Icon = root.Icon,
                     SortOrder = rootOrder++,
-                    ImageUrl = "/" + WriteImage(webRoot, $"images/categories/{rootSlug}.svg", CategorySvg(root.Name, root.Color)),
+                    ImageUrl = photos.Url(root.Subs[0].Products[0].Name)
+                               ?? "/" + WriteImage(webRoot, $"images/categories/{rootSlug}.svg", CategorySvg(root.Name, root.Color)),
                 };
                 db.Categories.Add(category);
 
@@ -61,7 +63,8 @@ public static class DbSeeder
                         Name = sub.Name,
                         Icon = root.Icon,
                         SortOrder = subOrder++,
-                        ImageUrl = "/" + WriteImage(webRoot, $"images/categories/{rootSlug}-{subOrder}.svg", SubcategorySvg(sub.Name, root.Color)),
+                        ImageUrl = photos.Url(sub.Products[0].Name)
+                                   ?? "/" + WriteImage(webRoot, $"images/categories/{rootSlug}-{subOrder}.svg", SubcategorySvg(sub.Name, root.Color)),
                     };
                     db.Categories.Add(subcategory);
 
@@ -75,7 +78,8 @@ public static class DbSeeder
                             Name = p.Name,
                             Description = p.Description ?? (p.Packaging is null ? p.Name : $"{p.Name}. Paketim: {p.Packaging}."),
                             Category = subcategory,
-                            ImageUrl = "/" + WriteImage(webRoot, $"images/products/{productCode}.svg", ProductSvg(p.Name, root.Color)),
+                            ImageUrl = photos.Url(p.Name)
+                                       ?? "/" + WriteImage(webRoot, $"images/products/{productCode}.svg", ProductSvg(p.Name, root.Color)),
                             Unit = p.Unit,
                             PackagingInfo = p.Packaging,
                             PackSize = p.PackSize,
@@ -141,6 +145,27 @@ public static class DbSeeder
                 await db.SaveChangesAsync(ct);
                 logger.LogInformation("Llogaria demo u krijua.");
             }
+        }
+    }
+
+    /// <summary>Kopjon fotot provizore te wwwroot/images/stock (një herë për secilën) dhe kthen URL-në.</summary>
+    private sealed class SeedPhotos(string sourceDir, string webRoot)
+    {
+        private readonly HashSet<string> _copied = [];
+
+        public string? Url(string productName)
+        {
+            var key = SeedCatalog.ImageFor(productName);
+            if (key is null) return null;
+            var source = Path.Combine(sourceDir, $"{key}.jpg");
+            if (!File.Exists(source)) return null;
+            if (_copied.Add(key))
+            {
+                var target = Path.Combine(webRoot, "images", "stock", $"{key}.jpg");
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                File.Copy(source, target, overwrite: true);
+            }
+            return $"/images/stock/{key}.jpg";
         }
     }
 
