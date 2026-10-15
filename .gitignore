@@ -39,3 +39,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# .NET
+server/**/bin/
+server/**/obj/
+server/**/wwwroot/images/
+*.user

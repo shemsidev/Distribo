@@ -1,0 +1,11 @@
+import { useEffect, useState } from 'react';
+
+/** Vlera përditësohet vetëm pasi përdoruesi ndalon së shkruari për `delayMs`. */
+export function useDebouncedValue<T>(value: T, delayMs = 350): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+  return debounced;
+}

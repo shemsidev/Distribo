@@ -1,0 +1,14 @@
+# Kërkesa shembull për VS Code (REST Client) / Visual Studio.
+@host = http://localhost:5180
+
+GET {{host}}/health
+
+###
+# Katalogu është publik (çmime bazë pa token).
+GET {{host}}/api/catalog/categories
+
+###
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "identifier": "0691234567", "password": "<fjalëkalimi i llogarisë demo nga appsettings.Development.json>" }
