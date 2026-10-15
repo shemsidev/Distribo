@@ -1,24 +1,53 @@
 import { Platform } from 'react-native';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
 
 import { meApi } from '@/services/api/endpoints';
 
 export type PushRegistrationResult = 'registered' | 'unsupported' | 'denied' | 'failed';
 
+type NotificationsModule = typeof import('expo-notifications');
+
+/** Expo Go në Android nuk ka më push që nga SDK 53; moduli as nuk ngarkohet aty. */
+const isExpoGoAndroid =
+  Platform.OS === 'android' && Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+let notificationsModule: NotificationsModule | null | undefined;
+
+/**
+ * Ngarkon expo-notifications vetëm kur mund të përdoret (jo në web, jo në Expo Go Android),
+ * që aplikacioni të hapet pa gabime edhe në Expo Go.
+ */
+export function getNotifications(): NotificationsModule | null {
+  if (notificationsModule !== undefined) return notificationsModule;
+  if (Platform.OS === 'web' || isExpoGoAndroid) {
+    notificationsModule = null;
+    return null;
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- ngarkim i kushtëzuar i modulit native
+    const mod = require('expo-notifications') as NotificationsModule;
+    // Njoftimet shfaqen edhe kur aplikacioni është i hapur.
+    mod.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+    notificationsModule = mod;
+  } catch {
+    notificationsModule = null;
+  }
+  return notificationsModule;
+}
+
 let registeredToken: string | null = null;
 
-// Njoftimet shfaqen edhe kur aplikacioni është i hapur.
-if (Platform.OS !== 'web') {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
+function projectId(): string | undefined {
+  const extra = Constants.expoConfig?.extra as { eas?: { projectId?: string } } | undefined;
+  return extra?.eas?.projectId ?? Constants.easConfig?.projectId;
 }
 
 /**
@@ -26,19 +55,14 @@ if (Platform.OS !== 'web') {
  * dhe me një projekt EAS. Expo Go në Android nuk i mbështet që nga SDK 53.
  */
 export function isPushSupported(): boolean {
-  if (Platform.OS === 'web' || !Device.isDevice) return false;
-  const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
-  if (isExpoGo && Platform.OS === 'android') return false;
+  if (Platform.OS === 'web' || isExpoGoAndroid || !Device.isDevice) return false;
   return !!projectId();
-}
-
-function projectId(): string | undefined {
-  const extra = Constants.expoConfig?.extra as { eas?: { projectId?: string } } | undefined;
-  return extra?.eas?.projectId ?? Constants.easConfig?.projectId;
 }
 
 export async function registerForPush(): Promise<PushRegistrationResult> {
   if (!isPushSupported()) return 'unsupported';
+  const Notifications = getNotifications();
+  if (!Notifications) return 'unsupported';
   try {
     if (Platform.OS === 'android') {
       // Kanali duhet të ekzistojë para kërkimit të lejes në Android 13+.

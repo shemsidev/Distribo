@@ -105,6 +105,7 @@ Web-i dhe API-ja duhet të jenë në të njëjtin domain bazë (`app.` dhe `api.
 npm install -g eas-cli
 eas login
 eas init                       # krijon projektin EAS dhe shton projectId (i nevojshëm për push)
+npx expo install expo-dev-client   # vetëm për build-in "development" (mos e mbani kur testoni me Expo Go)
 # Ndrysho EXPO_PUBLIC_API_URL te eas.json në adresën reale
 eas build --profile preview --platform android     # APK për testim
 eas build --profile production --platform all      # për Play Store / App Store

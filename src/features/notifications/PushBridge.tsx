@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
 import { router } from 'expo-router';
-import * as Notifications from 'expo-notifications';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { queryKeys } from '@/services/query';
-import { registerForPush, setPushStatus } from '@/services/notifications/push';
+import { getNotifications, registerForPush, setPushStatus } from '@/services/notifications/push';
 
 /**
  * Regjistron pajisjen për push pas hyrjes dhe hap porosinë kur përdoruesi prek një njoftim.
@@ -25,7 +23,8 @@ export function PushBridge() {
   }, []);
 
   useEffect(() => {
-    if (Platform.OS === 'web') return;
+    const Notifications = getNotifications();
+    if (!Notifications) return;
 
     const openOrder = (data: unknown) => {
       const orderId = (data as { orderId?: string } | undefined)?.orderId;
